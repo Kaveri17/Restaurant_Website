@@ -5,7 +5,7 @@ import crypto from "crypto";
 import cloudinary from "../utils/cloudinary";
 import { generateToken } from "../utils/generateToken";
 import { generateVerificationCode } from "../utils/generateVerificationCode";
-import { sendPasswordResetEmail, sendResetSuccessEmail, sendWelcomeEmail } from "../mailtrap/email";
+import { sendPasswordResetEmail, sendResetSuccessEmail, sendVerificationEmail, sendWelcomeEmail } from "../mailtrap/email";
 
 export const signup = async (req: Request, res: Response) => {
   try {
@@ -35,7 +35,7 @@ export const signup = async (req: Request, res: Response) => {
 
     // generate a jwt token to store the registered user data
     generateToken(res, user)
-    // sendVerificationEmail(user,verificationToken)
+    sendVerificationEmail(email,verificationToken)
 
     const userWithoutPassword = await User.findOne({ email }).select(
       "-password"
@@ -70,7 +70,7 @@ export const login = async (req: Request, res: Response) => {
       });
     }
 
-    // generateToken(res, user) //jwt token generation
+    generateToken(res, user) //jwt token generation
 
     user.lastLogin = new Date(); //reseting the current date
     await user.save();
