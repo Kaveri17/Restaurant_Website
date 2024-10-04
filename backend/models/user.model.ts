@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema<IUserDocument>({
     },
     profilePicture:{
         type:String,
-        required: true
+        // required: true
     },
     admin:{
         type:Boolean,

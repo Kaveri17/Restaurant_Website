@@ -2,7 +2,7 @@ import {
   Loader2,
   LocateIcon,
   Mail,
-  MapPin,
+  MapPin ,
   MapPinnedIcon,
   Plus,
 } from "lucide-react";
@@ -11,20 +11,23 @@ import { FormEvent, useRef, useState } from "react";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Button } from "./ui/button";
+import { useUserStore } from "@/store/useUserStore";
 
 const Profile = () => {
+  const {user, updateProfile} = useUserStore();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [profileData, setProfileData] = useState({
-    fullname: "",
-    email: "",
-    address: "",
-    city: "",
-    country: "",
-    profilePicture: "",
+    fullname: user?.fullname || "",
+    email: user?.email || "", 
+    address: user?.address || "",
+    city: user?.city || "",
+    country: user?.country || "",
+    profilePicture: user?.profilePicture || "",
   });
   const imageRef = useRef<HTMLInputElement | null>(null);
-  const [selectedProfilePicture, setSelectedProfilePicture] = useState<string>("");
-  const loading = false;
-
+  const [selectedProfilePicture, setSelectedProfilePicture] =
+    useState<string>( profileData.profilePicture || "");
+ 
   const fileChangeHandler = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -48,7 +51,13 @@ const Profile = () => {
 
   const updateProfileHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log(profileData);
+    try {
+      setIsLoading(true);
+      await updateProfile(profileData);
+      setIsLoading(false);
+    } catch (error) {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -56,7 +65,7 @@ const Profile = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Avatar className="relative md:w-28 md:h-28 w-20 h-20">
-            <AvatarImage src={selectedProfilePicture} />
+            <AvatarImage src={selectedProfilePicture}/>
             <AvatarFallback>CN</AvatarFallback>
             <input
               ref={imageRef}
@@ -87,6 +96,7 @@ const Profile = () => {
           <div className="w-full">
             <Label>Email</Label>
             <input
+            disabled
               name="email"
               value={profileData.email}
               onChange={changeHandler}
@@ -132,15 +142,13 @@ const Profile = () => {
         </div>
       </div>
       <div className="text-center">
-        {loading ? (
+        {isLoading ? (
           <Button disabled className="bg-orange hover:bg-hoverOrange">
             <Loader2 className="mr-2 w-4 h-4 animate-spin" />
             Please wait
           </Button>
         ) : (
-          <Button type="submit" className="bg-orange hover:bg-hoverOrange">
-            Update
-          </Button>
+          <Button type="submit" className="bg-orange hover:bg-hoverOrange">Update</Button>
         )}
       </div>
     </form>

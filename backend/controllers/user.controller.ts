@@ -30,7 +30,7 @@ export const signup = async (req: Request, res: Response) => {
       password: hashedPassword,
       contact: Number(contact), // because in our model its types is number and the value we recieve is of string so to remove the error we convert the input data to numeric value
       verificationToken,
-      verificationTokenExpiresAt: Date.now() + 24 * 60 * 60, // verification token expires after one days if more that 1 day needed multiply it with the required no. of days
+      verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000, // verification token expires after one days if more that 1 day needed multiply it with the required no. of days
     });
 
     // generate a jwt token to store the registered user data
@@ -95,6 +95,7 @@ export const login = async (req: Request, res: Response) => {
 export const verifyEmail = async (req: Request, res: Response) => {
   try {
     const { verificationCode } = req.body;
+    console.log(verificationCode)
     const user = await User.findOne({
       verificationToken: verificationCode,
       verificationTokenExpiresAt: { $gt: Date.now() },

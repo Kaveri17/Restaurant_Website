@@ -37,15 +37,26 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 import { Separator } from "./ui/separator";
+import { useUserStore } from "@/store/useUserStore";
+import { useCartStore } from "@/store/useCartStore";
+import { useThemeStore } from "@/store/useThemeStore";
 
 const Navbar = () => {
-  const admin = true;
-  const loading = false;
+  const { user, loading, logout, login } = useUserStore();
+  const { cart } = useCartStore();
+  const { setTheme } = useThemeStore();
+  // const state = localStorage.getItem('state')
+  // const parsedState = JSON.parse(state)
+  // const isAuthenticated = parsedState.isAuthenticated
+  // console.log(isAuthenticated)
+
+  const {isAuthenticated} = useUserStore()
+
   return (
     <div className="max-w-7xl mx-auto">
       <div className="flex items-center justify-between h-14">
         <Link to="/">
-          <h1 className="font-bold md:font-extrabold text-2xl">PatelEats</h1>
+          <h1 className="font-bold md:font-extrabold text-2xl">KavsEats</h1>
         </Link>
         <div className="hidden md:flex items-center gap-10">
           <div className="hidden md:flex items-center gap-6">
@@ -53,7 +64,7 @@ const Navbar = () => {
             <Link to="/profile">Profile</Link>
             <Link to="/order/status">Order</Link>
 
-            {admin && (
+            {user?.admin && (
               <Menubar>
                 <MenubarMenu>
                   <MenubarTrigger>Dashboard</MenubarTrigger>
@@ -83,21 +94,29 @@ const Navbar = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem>Light</DropdownMenuItem>
-                  <DropdownMenuItem>Dark</DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("light")}>
+                    Light
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => setTheme("dark")}>
+                    Dark
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
             <Link to="/cart" className="relative cursor-pointer">
               <ShoppingCart />
-              <Button
-                size={"icon"}
-                className="absolute -inset-y-3 left-2 text-xs rounded-full w-4 h-4 bg-red-500 hover:bg-red-500"
-              ></Button>
+              {cart.length > 0 && (
+                <Button
+                  size={"icon"}
+                  className="absolute -inset-y-3 left-2 text-xs rounded-full w-4 h-4 bg-red-500 hover:bg-red-500"
+                >
+                  {cart.length}
+                </Button>
+              )}
             </Link>
             <div>
               <Avatar>
-                <AvatarImage />
+                <AvatarImage src={user?.profilePicture} alt="profilephoto" />
                 <AvatarFallback>CN</AvatarFallback>
               </Avatar>
             </div>
@@ -108,7 +127,11 @@ const Navbar = () => {
                   Please wait
                 </Button>
               ) : (
-                <Button className="bg-orange hover:bg-hoverOrange">
+                
+                <Button
+                  onClick={logout}
+                  className="bg-orange hover:bg-hoverOrange"
+                >
                   Logout
                 </Button>
               )}
@@ -127,8 +150,8 @@ const Navbar = () => {
 export default Navbar;
 
 const MobileNavbar = () => {
-  const loading = false;
-
+  const { user, logout, loading } = useUserStore();
+  const { setTheme } = useThemeStore();
   return (
     <Sheet>
       <SheetTrigger asChild>
@@ -142,7 +165,7 @@ const MobileNavbar = () => {
       </SheetTrigger>
       <SheetContent className="flex flex-col">
         <SheetHeader className="flex flex-row items-center justify-between mt-2">
-          <SheetTitle>PatelEats</SheetTitle>
+          <SheetTitle>KavsEats</SheetTitle>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline" size="icon">
@@ -152,8 +175,12 @@ const MobileNavbar = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuItem>Light</DropdownMenuItem>
-              <DropdownMenuItem>Dark</DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("light")}>
+                Light
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => setTheme("dark")}>
+                Dark
+              </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </SheetHeader>
@@ -180,35 +207,39 @@ const MobileNavbar = () => {
             <ShoppingCart />
             <span>Cart (0)</span>
           </Link>
-          <Link
-            to="/admin/menu"
-            className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900 font-medium"
-          >
-            <SquareMenu />
-            <span>Menu</span>
-          </Link>
-          <Link
-            to="/admin/restaurant"
-            className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900 font-medium"
-          >
-            <UtensilsCrossed />
-            <span>Restaurant</span>
-          </Link>
-          <Link
-            to="/admin/orders"
-            className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900 font-medium"
-          >
-            <PackageCheck />
-            <span>Restaurant Orders</span>
-          </Link>
+          {user?.admin && (
+            <>
+              <Link
+                to="/admin/menu"
+                className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900 font-medium"
+              >
+                <SquareMenu />
+                <span>Menu</span>
+              </Link>
+              <Link
+                to="/admin/restaurant"
+                className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900 font-medium"
+              >
+                <UtensilsCrossed />
+                <span>Restaurant</span>
+              </Link>
+              <Link
+                to="/admin/orders"
+                className="flex items-center gap-4 hover:bg-gray-200 px-3 py-2 rounded-lg cursor-pointer hover:text-gray-900 font-medium"
+              >
+                <PackageCheck />
+                <span>Restaurant Orders</span>
+              </Link>
+            </>
+          )}
         </SheetDescription>
         <SheetFooter className="flex flex-col gap-4">
           <div className="flex flex-row items-center gap-2">
             <Avatar>
-              <AvatarImage />
+              <AvatarImage src={user?.profilePicture} />
               <AvatarFallback>CN</AvatarFallback>
             </Avatar>
-            <h1 className="font-bold">Patel Mernstack</h1>
+            <h1 className="font-bold">{user?.fullname}</h1>
           </div>
           <SheetClose asChild>
             {loading ? (
@@ -217,7 +248,24 @@ const MobileNavbar = () => {
                 Please wait
               </Button>
             ) : (
-              <Button className="bg-orange hover:bg-hoverOrange">Logout</Button>
+              //  {isAuthenticated ? (
+              //   <Button
+              //     onClick={login}
+              //     className="bg-orange hover:bg-hoverOrange"
+              //   >
+              //     Login
+              //   </Button>
+
+              // ):(
+
+              <Button
+                onClick={logout}
+                className="bg-orange hover:bg-hoverOrange"
+              >
+                Logout
+              </Button>
+
+              // }
             )}
           </SheetClose>
         </SheetFooter>

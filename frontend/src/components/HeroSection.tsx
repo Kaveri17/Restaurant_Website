@@ -5,7 +5,7 @@ import { Button } from "./ui/button";
 import HereImage from "@/assets/hero_pizza.png";
 import { useNavigate } from "react-router-dom";
 
-const HeroSection = () => {
+const HereSection = () => {
   const [searchText, setSearchText] = useState<string>("");
   const navigate = useNavigate();
   return (
@@ -16,7 +16,7 @@ const HeroSection = () => {
             Order Food anytime & anywhere
           </h1>
           <p className="text-gray-500">
-            Hey! Our Delicios food is waiting for you, we are always near to
+            Hey! Our Delicious food is waiting for you, we are always near to
             you.
           </p>
         </div>
@@ -43,4 +43,4 @@ const HeroSection = () => {
   );
 };
 
-export default HeroSection;
+export default HereSection;

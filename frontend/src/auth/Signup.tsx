@@ -2,9 +2,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { SignupInputState, userSignupSchema } from "@/schema/userSchema";
+import { useUserStore } from "@/store/useUserStore";
 import { Loader2, LockKeyhole, Mail, PhoneOutgoing, User } from "lucide-react";
 import { ChangeEvent, FormEvent, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 // type SignInputState = {
 //   fullname: string;
@@ -19,7 +20,9 @@ const Signup = () => {
     password: "",
     contact: "",
   });
+  const {signup, loading} = useUserStore()
   const [errors,setErrors] = useState<Partial<SignupInputState>>({}) // Partial becuz only one field or input field can have error from the SignupInputState not matching the input's type 
+  const navigate = useNavigate()
   const changeEventHandler = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setInput({ ...input, [name]: value });
@@ -34,9 +37,14 @@ const Signup = () => {
         return;
     }
     // login api implemenation will start here
-    console.log(input);
+    try {
+      await signup(input)
+      navigate("/verify-email")
+    } catch (error) {
+      console.log(error)
+    }
   };
-  const loading = false;
+
   return (
     <div className="flex items-center justify-center min-h-screen">
       <form
@@ -45,7 +53,7 @@ const Signup = () => {
         className="md:p-8 w-full max-w-md rounded-lg md:border border-gray-200 mx-4"
       >
         <div className="mb-4">
-          <h1 className="font-bold text-2xl">PatelEats</h1>
+          <h1 className="font-bold text-2xl">KavsEats</h1>
         </div>
         <div className="mb-4">
           <div className="relative">
